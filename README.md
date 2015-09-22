@@ -1,7 +1,7 @@
 Git Keywords Checker
 ====================
 
-This hook let you check for common oversights like `var_dump()`, `die()` or `console.log()` and prevent you from commit them.
+This hook let you check for common oversights like `var_dump()`, `die()`, `console.log()` or `TODO remove` and prevent you from commit them.
 
 Installation
 ------------
