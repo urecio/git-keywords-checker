@@ -5,7 +5,7 @@
 # Add or remove keywords here
 KEYWORDS_REGEX="var_dump\(|die\(|Zend_Debug::|print_r\(|console\.(debug|log)\(|TODO.*remove"
 # Add extensions to check here
-EXTENSIONS_REGEX="(.php$|.phtml$|.js$)"
+EXTENSIONS_REGEX="(.php$|.phtml$|.js$|.jsx$|.json$)"
 
 ERRORS_BUFFER=""
 TEXT_DEFAULT="\\033[0;39m"
@@ -61,8 +61,22 @@ for FILE in $FILES; do
             echo -e "$ERRORS"
         fi
      fi
-done
 
+     if [[ $FILE =~ "package.json" ]]; then
+       ERRORS_HEADER="Errors found in package.json: "
+       REGEX_PACKAGEJSON="file:"
+       ERRORS=""
+       while IFS=: read -ra RESULT; do
+         if [ "$RESULT" != "" ]; then
+           ERRORS="\n"$(sed -n ${RESULT[1]}p $FILE | $SED_EXTENDED_CMD "s/($REGEX_PACKAGEJSON)/\\$TEXT_UNDERLINE\1\\$TEXT_DEFAULT/g")
+         fi
+       done < <(grep -sEnH $REGEX_PACKAGEJSON $FILE)
+       if [ "$ERRORS" != "" ]; then
+         ERRORS_BUFFER="$ERRORS_HEADER $ERRORS"
+         echo -e "$ERRORS"
+       fi
+     fi
+done
 if [ "$ERRORS_BUFFER" != "" ]; then
     echo
     echo -e "$TEXT_ERROR" "There were errors or warnings, commit aborted." "$TEXT_DEFAULT"
